@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>모닝 브리핑 — 오늘 날씨 한눈에</title>
+<meta name="description" content="지금 날씨, 미세먼지, 7일 예보를 실시간으로 보여주는 아침 브리핑.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="app">
+
+  <div class="header">
+    <div>
+      <p id="greet" class="greet">좋은 아침이에요 👋</p>
+      <p id="date-line" class="date"></p>
+    </div>
+    <button id="btn-loc" class="loc-btn">📍 <span id="loc-name">서울</span></button>
+  </div>
+
+  <div id="content">
+    <div class="state-msg" id="state-loading">
+      <span class="big">⛅</span>
+      날씨를 불러오는 중…
+    </div>
+  </div>
+
+  <div class="refresh-line" id="refresh-line" hidden>
+    <button id="btn-refresh" class="refresh-btn">↻ 새로고침</button>
+    <span class="footer-note" id="updated-at"></span>
+  </div>
+
+  <p class="fineprint">기상 · 대기질 데이터 제공: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (ECMWF · CAMS)<br>
+  미세먼지 등급은 한국 통합대기환경지수(CAI) 24시간 기준을 따릅니다.</p>
+
+</main>
+
+<div id="sheet-backdrop" class="sheet-backdrop" hidden>
+  <div class="sheet">
+    <h3>도시 선택</h3>
+    <div id="city-list" class="city-list"></div>
+    <button id="sheet-close" class="sheet-close">닫기</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
