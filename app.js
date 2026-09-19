@@ -15,6 +15,34 @@ const CITIES = [
 // 메모리에만 들고 있는다 (기본값 서울).
 let current = { ...CITIES[0] };
 
+const DEFAULT_KEYWORDS = ["AI", "업무 자동화", "부동산", "재테크", "금융"];
+
+// 관심 키워드는 사람마다 다르고 계속 쓸 값이라 localStorage에 저장한다.
+// (이 페이지는 각자 브라우저에 저장되는 거라 다른 사람 화면에는 영향 없음)
+function loadKeywords() {
+  try {
+    const raw = JSON.parse(localStorage.getItem("mb_keywords"));
+    if (Array.isArray(raw) && raw.length) return raw;
+  } catch (_) { /* 저장소를 못 쓰는 환경이면 기본값으로 */ }
+  return [...DEFAULT_KEYWORDS];
+}
+function saveKeywords(list) {
+  try { localStorage.setItem("mb_keywords", JSON.stringify(list)); } catch (_) { /* 무시 */ }
+}
+function loadSelectedKeyword(list) {
+  try {
+    const saved = localStorage.getItem("mb_selected_keyword");
+    if (saved && list.includes(saved)) return saved;
+  } catch (_) { /* 무시 */ }
+  return list[0];
+}
+function saveSelectedKeyword(kw) {
+  try { localStorage.setItem("mb_selected_keyword", kw); } catch (_) { /* 무시 */ }
+}
+
+let keywords = loadKeywords();
+let selectedKeyword = loadSelectedKeyword(keywords);
+
 const WMO = {
   0: ["☀️", "맑음"], 1: ["🌤️", "대체로 맑음"], 2: ["⛅", "구름 조금"], 3: ["☁️", "흐림"],
   45: ["🌫️", "안개"], 48: ["🌫️", "짙은 안개"],
@@ -143,6 +171,106 @@ function renderWeek(w) {
   return `<p class="week-title">7일 예보</p><div class="week-scroll">${days}</div>`;
 }
 
+function timeAgo(pubDateStr) {
+  const d = new Date(pubDateStr);
+  if (isNaN(d)) return "";
+  const diffMin = Math.round((Date.now() - d.getTime()) / 60000);
+  if (diffMin < 1) return "방금 전";
+  if (diffMin < 60) return diffMin + "분 전";
+  const diffHour = Math.round(diffMin / 60);
+  if (diffHour < 24) return diffHour + "시간 전";
+  return Math.round(diffHour / 24) + "일 전";
+}
+
+function renderKeywordChips() {
+  const box = $("kw-chips");
+  box.innerHTML = keywords.map((kw) => `
+    <button class="kw-chip" data-kw="${kw}" aria-pressed="${kw === selectedKeyword}">${kw}</button>
+  `).join("");
+  box.querySelectorAll(".kw-chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedKeyword = btn.dataset.kw;
+      saveSelectedKeyword(selectedKeyword);
+      renderKeywordChips();
+      loadNews();
+    });
+  });
+}
+
+async function loadNews() {
+  const list = $("news-list");
+  if (!keywords.length) {
+    list.innerHTML = `<p class="news-empty">편집에서 키워드를 추가해보세요.</p>`;
+    return;
+  }
+  list.innerHTML = `<p class="news-loading">"${selectedKeyword}" 뉴스를 불러오는 중…</p>`;
+  try {
+    const res = await fetch(`/api/news?q=${encodeURIComponent(selectedKeyword)}`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const items = data.items || [];
+    if (!items.length) {
+      list.innerHTML = `<p class="news-empty">"${selectedKeyword}" 관련 최신 기사를 찾지 못했습니다.</p>`;
+      return;
+    }
+    list.innerHTML = items.slice(0, 5).map((it) => `
+      <a class="news-item" href="${it.link}" target="_blank" rel="noopener">
+        <div class="news-item-title">${it.title}</div>
+        <div class="news-item-meta">${it.source || "Google 뉴스"} · ${timeAgo(it.pubDate)}</div>
+      </a>
+    `).join("");
+  } catch (err) {
+    list.innerHTML = `<p class="news-error">뉴스를 불러오지 못했습니다. <span class="small">(${err.message})</span></p>`;
+  }
+}
+
+function renderKeywordManageList() {
+  const box = $("kw-manage-list");
+  box.innerHTML = keywords.map((kw) => `
+    <div class="kw-manage-item">
+      <span>${kw}</span>
+      <button class="kw-remove-btn" data-kw="${kw}">삭제</button>
+    </div>
+  `).join("");
+  box.querySelectorAll(".kw-remove-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (keywords.length <= 1) return; // 최소 1개는 남긴다
+      keywords = keywords.filter((k) => k !== btn.dataset.kw);
+      saveKeywords(keywords);
+      if (selectedKeyword === btn.dataset.kw) {
+        selectedKeyword = keywords[0];
+        saveSelectedKeyword(selectedKeyword);
+      }
+      renderKeywordManageList();
+      renderKeywordChips();
+      loadNews();
+    });
+  });
+}
+
+function openKwSheet() {
+  renderKeywordManageList();
+  $("kw-input").value = "";
+  $("kw-sheet-backdrop").hidden = false;
+}
+
+function addKeyword() {
+  const input = $("kw-input");
+  const value = input.value.trim();
+  if (!value || keywords.includes(value) || keywords.length >= 12) {
+    input.value = "";
+    return;
+  }
+  keywords.push(value);
+  saveKeywords(keywords);
+  selectedKeyword = value;
+  saveSelectedKeyword(selectedKeyword);
+  input.value = "";
+  renderKeywordManageList();
+  renderKeywordChips();
+  loadNews();
+}
+
 async function load() {
   renderHeader();
   $("refresh-line").hidden = true;
@@ -198,4 +326,14 @@ $("sheet-backdrop").addEventListener("click", (e) => {
 });
 $("btn-refresh").addEventListener("click", load);
 
+$("btn-kw-edit").addEventListener("click", openKwSheet);
+$("kw-sheet-close").addEventListener("click", () => { $("kw-sheet-backdrop").hidden = true; });
+$("kw-sheet-backdrop").addEventListener("click", (e) => {
+  if (e.target.id === "kw-sheet-backdrop") $("kw-sheet-backdrop").hidden = true;
+});
+$("kw-add-btn").addEventListener("click", addKeyword);
+$("kw-input").addEventListener("keydown", (e) => { if (e.key === "Enter") addKeyword(); });
+
 load();
+renderKeywordChips();
+loadNews();
