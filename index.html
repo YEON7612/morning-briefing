@@ -31,8 +31,18 @@
     <span class="footer-note" id="updated-at"></span>
   </div>
 
+  <div class="news-card">
+    <div class="news-head">
+      <p class="news-title">관심 뉴스</p>
+      <button id="btn-kw-edit" class="kw-edit-btn">키워드 편집</button>
+    </div>
+    <div id="kw-chips" class="kw-chips"></div>
+    <div id="news-list" class="news-list"></div>
+  </div>
+
   <p class="fineprint">기상 · 대기질 데이터 제공: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> (ECMWF · CAMS)<br>
-  미세먼지 등급은 한국 통합대기환경지수(CAI) 24시간 기준을 따릅니다.</p>
+  미세먼지 등급은 한국 통합대기환경지수(CAI) 24시간 기준을 따릅니다.<br>
+  뉴스 제공: <a href="https://news.google.com" target="_blank" rel="noopener">Google 뉴스</a> 검색 결과.</p>
 
 </main>
 
@@ -41,6 +51,18 @@
     <h3>도시 선택</h3>
     <div id="city-list" class="city-list"></div>
     <button id="sheet-close" class="sheet-close">닫기</button>
+  </div>
+</div>
+
+<div id="kw-sheet-backdrop" class="sheet-backdrop" hidden>
+  <div class="sheet">
+    <h3>키워드 관리</h3>
+    <div class="kw-add-row">
+      <input id="kw-input" class="kw-input" type="text" placeholder="키워드 추가 (예: 반도체)" maxlength="20">
+      <button id="kw-add-btn" class="kw-add-btn">추가</button>
+    </div>
+    <div id="kw-manage-list" class="kw-manage-list"></div>
+    <button id="kw-sheet-close" class="sheet-close">닫기</button>
   </div>
 </div>
 
