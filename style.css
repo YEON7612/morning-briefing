@@ -140,6 +140,58 @@ html, body {
   border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; cursor: pointer;
 }
 
+/* 관심 뉴스 */
+.news-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px 18px; margin-bottom: 14px;
+}
+.news-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; }
+.news-title { font-size: 13px; color: var(--muted); font-weight: 700; margin: 0; }
+.kw-edit-btn {
+  width: auto; background: none; border: 1px solid var(--line); color: var(--muted);
+  font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+}
+.kw-chips {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px;
+  scrollbar-width: none;
+}
+.kw-chips::-webkit-scrollbar { display: none; }
+.kw-chip {
+  flex: 0 0 auto; font: inherit; font-size: 12.5px; font-weight: 700; padding: 8px 14px;
+  border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--line);
+  color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.kw-chip[aria-pressed="true"] { border-color: var(--brand); color: var(--brand); background: rgba(251,146,60,.14); }
+.news-list { display: grid; }
+.news-item {
+  display: block; padding: 12px 0; border-top: 1px solid var(--line);
+  text-decoration: none; color: var(--ink);
+}
+.news-item:first-child { border-top: 0; padding-top: 0; }
+.news-item-title { font-size: 14px; font-weight: 600; line-height: 1.45; margin-bottom: 5px; }
+.news-item-meta { font-size: 11.5px; color: var(--muted); }
+.news-empty, .news-loading, .news-error { font-size: 13px; color: var(--muted); padding: 10px 0; }
+
+/* 키워드 관리 시트 */
+.kw-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.kw-input {
+  flex: 1; font: inherit; background: var(--card); border: 1px solid var(--line);
+  color: var(--ink); border-radius: 12px; padding: 12px 14px; min-width: 0;
+}
+.kw-add-btn {
+  width: auto; background: var(--brand); color: #0e1030; border: 0; border-radius: 12px;
+  padding: 0 16px; font-weight: 700; cursor: pointer;
+}
+.kw-manage-list { display: grid; gap: 8px; margin-bottom: 14px; max-height: 240px; overflow-y: auto; }
+.kw-manage-item {
+  display: flex; justify-content: space-between; align-items: center; background: var(--card);
+  border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-weight: 600;
+}
+.kw-remove-btn {
+  width: auto; background: none; border: 0; color: var(--bad); font: inherit;
+  font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
