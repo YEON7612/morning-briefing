@@ -36,6 +36,11 @@ html, body {
   padding: 24px 20px calc(32px + env(safe-area-inset-bottom));
 }
 
+/* 기본(폰): 위아래로 쌓인다. 넓은 화면에서는 아래 미디어쿼리로 옆으로 붙인다. */
+.layout { display: block; }
+.main-col { min-width: 0; }
+.side-col { margin-top: 0; }
+
 .view { animation: in .25s ease; }
 @keyframes in { from { opacity: 0; transform: translateY(6px) } to { opacity: 1 } }
 
@@ -190,6 +195,22 @@ html, body {
 .kw-remove-btn {
   width: auto; background: none; border: 0; color: var(--bad); font: inherit;
   font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 6px;
+}
+
+/* 넓은 화면(PC 등)에서는 관심 뉴스를 오른쪽으로 붙인다 */
+@media (min-width: 860px) {
+  #app { max-width: 900px; }
+  .layout {
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    align-items: start;
+    gap: 28px;
+  }
+  .side-col {
+    position: sticky;
+    top: 24px;
+  }
+  .fineprint { max-width: 460px; margin-left: 0; margin-right: 0; text-align: left; }
 }
 
 @media (prefers-reduced-motion: reduce) {
