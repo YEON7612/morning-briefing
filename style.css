@@ -16,6 +16,9 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+/* hidden 속성이 display 규칙에 지지 않게 한다. */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   background: radial-gradient(900px 600px at 50% -10%, var(--bg2), var(--bg));
